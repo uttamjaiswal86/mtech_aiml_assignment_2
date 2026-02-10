@@ -1,7 +1,3 @@
-"""
-Credit Card Fraud Detection - Data Exploration & Preprocessing
-Dataset: Credit Card Fraud Detection from Kaggle
-"""
 import sys
 import os
 import pandas as pd
@@ -14,15 +10,13 @@ import warnings
 warnings.filterwarnings('ignore')
 import zipfile
 
-# ============================================================================
-# STEP 1: LOAD AND EXPLORE DATA
-# ============================================================================
-
+#Step -1 
 print("Loading Credit Card Fraud Detection Dataset...")
 current_path = os.path.dirname(os.path.abspath(__file__))
 parent_directory = os.path.abspath(os.path.join(current_path, '..'))
-zf = zipfile.ZipFile(f'{parent_directory}/data/creditcard.csv.zip') 
-df = pd.read_csv(zf.open('creditcard.csv'))
+#zf = zipfile.ZipFile(f'{parent_directory}/data/creditcard.csv.zip') 
+CSV_FILE = f'{parent_directory}/data/creditcard.csv'
+df = pd.read_csv(CSV_FILE)
 
 print("="*80)
 print("DATASET OVERVIEW")
@@ -52,7 +46,7 @@ print("="*80)
 missing_values = df.isnull().sum()
 print(f"Total missing values: {missing_values.sum()}")
 if missing_values.sum() == 0:
-    print("✓ No missing values found!")
+    print("No missing values found!")
 
 print("\n" + "="*80)
 print("TARGET VARIABLE DISTRIBUTION (Class)")
@@ -63,11 +57,7 @@ print(f"\nClass Distribution (%):")
 print(df['Class'].value_counts(normalize=True) * 100)
 
 fraud_percentage = (class_counts[1] / len(df)) * 100
-print(f"\n⚠️  Dataset is highly imbalanced: {fraud_percentage:.2f}% fraudulent transactions")
-
-# ============================================================================
-# STEP 2: FEATURE ANALYSIS
-# ============================================================================
+print(f"\nDataset is highly imbalanced: {fraud_percentage:.2f}% fraudulent transactions")
 
 print("\n" + "="*80)
 print("FEATURE STATISTICS")
@@ -87,10 +77,6 @@ print(f"  Median: ${df['Amount'].median():.2f}")
 # Amount distribution by class
 print("\nAmount Statistics by Class:")
 print(df.groupby('Class')['Amount'].describe())
-
-# ============================================================================
-# STEP 3: DATA VISUALIZATION
-# ============================================================================
 
 # Class Distribution
 fig, axes = plt.subplots(2, 2, figsize=(14, 10))
@@ -135,11 +121,7 @@ plt.suptitle('')  # Remove auto title
 
 plt.tight_layout()
 plt.savefig('data_exploration.png', dpi=300, bbox_inches='tight')
-print("\n✓ Visualization saved as 'data_exploration.png'")
-
-# ============================================================================
-# STEP 4: CORRELATION ANALYSIS
-# ============================================================================
+print("\nVisualization saved as 'data_exploration.png'")
 
 print("\n" + "="*80)
 print("CORRELATION ANALYSIS")
@@ -172,11 +154,7 @@ sns.heatmap(
 plt.title('Correlation Matrix - Top 15 Features with Class', fontsize=16, fontweight='bold')
 plt.tight_layout()
 plt.savefig('correlation_matrix.png', dpi=300, bbox_inches='tight')
-print("✓ Correlation matrix saved as 'correlation_matrix.png'")
-
-# ============================================================================
-# STEP 5: DATA PREPROCESSING
-# ============================================================================
+print("Correlation matrix saved as 'correlation_matrix.png'")
 
 print("\n" + "="*80)
 print("DATA PREPROCESSING")
@@ -190,7 +168,7 @@ print("\nScaling 'Time' and 'Amount' features...")
 scaler_time_amount = StandardScaler()
 df_processed[['Time', 'Amount']] = scaler_time_amount.fit_transform(df_processed[['Time', 'Amount']])
 
-print("✓ Features scaled successfully")
+print("Features scaled successfully")
 
 # Separate features and target
 X = df_processed.drop('Class', axis=1)
@@ -200,10 +178,6 @@ print(f"\nFeatures (X) shape: {X.shape}")
 print(f"Target (y) shape: {y.shape}")
 print(f"\nFeature columns ({len(X.columns)} features):")
 print(list(X.columns))
-
-# ============================================================================
-# STEP 6: TRAIN-TEST SPLIT
-# ============================================================================
 
 print("\n" + "="*80)
 print("TRAIN-TEST SPLIT")
@@ -228,10 +202,6 @@ print(f"\nTest set class distribution:")
 print(y_test.value_counts())
 print(f"Test fraud percentage: {(y_test.sum() / len(y_test)) * 100:.2f}%")
 
-# ============================================================================
-# STEP 7: SAVE PREPROCESSED DATA
-# ============================================================================
-
 print("\n" + "="*80)
 print("SAVING PREPROCESSED DATA")
 print("="*80)
@@ -241,20 +211,16 @@ X_test.to_csv('X_test.csv', index=False)
 y_train.to_csv('y_train.csv', index=False)
 y_test.to_csv('y_test.csv', index=False)
 
-print("✓ X_train.csv")
-print("✓ X_test.csv")
-print("✓ y_train.csv")
-print("✓ y_test.csv")
+print("X_train.csv")
+print("X_test.csv")
+print("y_train.csv")
+print("y_test.csv")
 
 # Save feature names
 import pickle
 with open('feature_names.pkl', 'wb') as f:
     pickle.dump(list(X.columns), f)
-print("✓ feature_names.pkl")
-
-# ============================================================================
-# STEP 8: ADDITIONAL VISUALIZATIONS
-# ============================================================================
+print("feature_names.pkl")
 
 # Class distribution in train/test
 fig, ax = plt.subplots(1, 2, figsize=(12, 4))
@@ -275,17 +241,8 @@ ax[1].set_xticklabels(['Legitimate', 'Fraud'], rotation=0)
 
 plt.tight_layout()
 plt.savefig('train_test_distribution.png', dpi=300, bbox_inches='tight')
-print("✓ train_test_distribution.png")
+print("train_test_distribution.png")
 
 print("\n" + "="*80)
 print("DATA EXPLORATION AND PREPROCESSING COMPLETE!")
-print("="*80)
-print("\n📊 Generated Files:")
-print("  1. data_exploration.png")
-print("  2. correlation_matrix.png")
-print("  3. train_test_distribution.png")
-print("  4. X_train.csv, X_test.csv")
-print("  5. y_train.csv, y_test.csv")
-print("  6. feature_names.pkl")
-print("\n✅ Ready for model training!")
 print("="*80)
