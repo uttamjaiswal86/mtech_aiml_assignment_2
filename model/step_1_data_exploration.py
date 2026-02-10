@@ -15,8 +15,8 @@ print("Loading Credit Card Fraud Detection Dataset...")
 current_path = os.path.dirname(os.path.abspath(__file__))
 parent_directory = os.path.abspath(os.path.join(current_path, '..'))
 #zf = zipfile.ZipFile(f'{parent_directory}/data/creditcard.csv.zip') 
-CSV_FILE = f'{parent_directory}/data/creditcard.csv'
-df = pd.read_csv(CSV_FILE)
+CSV_FILE = f'{parent_directory}/data/creditcard_dataset.csv'
+df = pd.read_csv(CSV_FILE).dropna()
 
 print("="*80)
 print("DATASET OVERVIEW")

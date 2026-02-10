@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -9,6 +10,14 @@ from sklearn.metrics import (
     recall_score, f1_score, matthews_corrcoef,
     confusion_matrix, classification_report, roc_curve
 )
+import requests
+current_path = os.path.dirname(os.path.abspath(__file__))
+parent_directory = os.path.abspath(os.path.join(current_path, '..'))
+
+github_url = "https://raw.githubusercontent.com/uttamjaiswal86/mtech_aiml_assignment_2/refs/heads/main/sample_test_data.csv"
+model_compare_csv = f'{current_path}/model/model_comparison_results.csv'
+
+
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -44,6 +53,19 @@ st.markdown("""
 st.title("Project: Credit Card Fraud Detection ( ML Assignment - 2)")
 st.markdown("""This project's application detects fraudulent credit card transactions using 6 different ML classification models. To test upload your sample transaction data (CSV) to get predictions and evaluate model performance.""")
 st.markdown("---")
+
+
+@st.cache_data
+def fetch_github_data(url):
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.text
+    else:
+        st.error("Failed to fetch data from GitHub.")
+        return None
+
+file_contents = fetch_github_data(github_url)
+
 
 @st.cache_resource
 def load_models():
@@ -130,12 +152,11 @@ st.sidebar.markdown("""
 """)
 
 st.sidebar.markdown("---")
-st.sidebar.markdown("### About Dataset")
+st.sidebar.markdown("### More about Dataset")
 st.sidebar.info("""
 **Credit Card Fraud Detection**
 - 30 Features (V1-V28 PCA, Time, Amount)
-- 284,807 Transactions
-- Highly imbalanced (0.17% fraud) """)
+- 100K Transactions""")
 
 # FILE UPLOAD SECTION
 st.header(" Upload Transaction Data")
@@ -154,7 +175,7 @@ with col2:
     st.markdown("### Need Sample Data?")
     st.download_button(
         label="Download Sample CSV",
-        data='URL',
+        data=file_contents,
         file_name="sample_test_data.csv",
         mime="text/csv",
         help="Download a sample CSV file with correct format (5 transactions)",
@@ -166,7 +187,7 @@ st.markdown("---")
 if uploaded_file is not None:
     try:
         # Load the data
-        df = pd.read_csv(uploaded_file)
+        df = pd.read_csv(uploaded_file).dropna()
         
         st.success(f"File uploaded successfully! Shape: {df.shape}")
         
@@ -449,7 +470,7 @@ if uploaded_file is not None:
                 st.success("Fraud detection completed successfully!")
     
     except Exception as e:
-        st.error(f"❌ Error processing file: {str(e)}")
+        st.error(f"Error processing file: {str(e)}")
         st.exception(e)
 
 else:
@@ -501,7 +522,7 @@ else:
         st.subheader("Get Sample Data")
         st.download_button(
             label="Download Sample CSV",
-            data="URL",
+            data=file_contents,
             file_name="sample_credit_card_test.csv",
             mime="text/csv",
             help=f"Download sample file with {num_samples} transactions in correct format",
@@ -515,7 +536,7 @@ else:
         st.markdown("---")
         
         # Additional help
-        st.markdown("**📚 Need Help?**")
+        st.markdown("**Need Help?** !!! Important Notes !!!")
         st.markdown("""
         - **Missing data?** All 30 features are required
         - **Wrong format?** Use the sample CSV as template
@@ -525,15 +546,11 @@ else:
     
     st.markdown("---")
 
-# ============================================================================
-# MODEL COMPARISON
-# ============================================================================
-
 st.markdown("---")
 st.header("Model Performance Comparison")
 
 try:
-    comparison_df = pd.read_csv('model_comparison_results.csv')
+    comparison_df = pd.read_csv(model_compare_csv)
     
     st.dataframe(
         comparison_df.style.highlight_max(
@@ -571,7 +588,7 @@ try:
     
     with col2:
         # Best models summary
-        st.markdown("### 🏆 Best Performers")
+        st.markdown("### Best Performers")
         
         best_accuracy = comparison_df.loc[comparison_df['Accuracy'].idxmax(), 'Model']
         best_recall = comparison_df.loc[comparison_df['Recall'].idxmax(), 'Model']
@@ -591,10 +608,6 @@ try:
     
 except FileNotFoundError:
     st.warning("Model comparison results not found. Train models first.")
-
-# ============================================================================
-# FOOTER
-# ============================================================================
 
 st.markdown("---")
 st.markdown("""
