@@ -1,6 +1,6 @@
 # Course :- M.Tech (AIML) ML Assignment - 2
 
-## Submission Date - 13 Feb 2026
+## Submission Date - 12 Feb 2026
 
 ## Student - Uttam Kumar
 
